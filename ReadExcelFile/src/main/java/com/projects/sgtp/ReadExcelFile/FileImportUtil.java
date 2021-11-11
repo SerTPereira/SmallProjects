@@ -10,6 +10,14 @@ import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+/**
+ * Importação de Arquivos utilizando Apache POI
+ * 
+ * https://poi.apache.org/
+ * 
+ * @author SergioGTP
+ *
+ */
 public class FileImportUtil {
 
 	/**
