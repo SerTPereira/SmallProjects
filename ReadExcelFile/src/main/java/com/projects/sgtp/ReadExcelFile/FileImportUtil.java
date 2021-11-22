@@ -2,10 +2,13 @@ package com.projects.sgtp.ReadExcelFile;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Row.MissingCellPolicy;
 import org.apache.poi.ss.util.CellAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -73,6 +76,74 @@ public class FileImportUtil {
 		} catch (Exception e) {
 			System.out.println("Exception: " + e.getMessage());
 		}
+	}
+	
+	
+	public List<Aluno> importListAluno(FileInputStream fileStream) {
+		List<Aluno> alunos = new ArrayList<Aluno>();
+		int rowNumber;
+		Aluno aluno;
+		
+		try {
+			XSSFWorkbook workbook = new XSSFWorkbook(fileStream);
+			
+			int sheetCount = workbook.getNumberOfSheets();
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			
+			Iterator<Row> rowIterator = sheet.iterator();
+			while (rowIterator.hasNext()) {
+				Row row = (Row) rowIterator.next();
+				
+				rowNumber = row.getRowNum();
+				if(rowNumber == 0) {
+					System.out.println("Primeira linha skip: [" + rowNumber + "]");
+				} else {
+					aluno = new Aluno(
+							extractCellValue(row.getCell(0, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
+							extractCellValue(row.getCell(1, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
+							extractCellValue(row.getCell(2, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
+							extractCellValue(row.getCell(3, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
+							extractCellValue(row.getCell(4, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
+							extractCellValue(row.getCell(5, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
+
+					System.out.println("Linha [" + String.format("%3d", rowNumber) + "] : " + aluno);
+					alunos.add(aluno);
+				}
+				
+
+			}
+			
+			workbook.close();
+		} catch (Exception e) {
+			System.out.println("Exception: " + e.getMessage());
+		}
+		
+		return alunos;
+	}
+	
+	
+	public String extractCellValue(Cell cell) {
+		String result;
+		
+		switch (cell.getCellType()) {
+		case STRING:
+			result = cell.getStringCellValue(); 
+			break;
+			
+		case NUMERIC:
+			result = "" + ((int) cell.getNumericCellValue());
+			break;
+			
+		case BLANK:
+			result = "";
+			break;
+
+		default:
+			result = ":: Erro :: Valor inválido encontrado na planilha de importação. (Célula: " + cell.getAddress() +")";
+			break;
+		}
+		
+		return result;		
 	}
 	
 	/**

@@ -9,11 +9,11 @@ public class App {
 	public static void main(String[] args) {
 		FileImportUtil fileImport = new FileImportUtil();
 		
-		File file = new File("C:\\DevTools\\Template.xlsx");
+		File file = new File("C:\\DevTools\\DevGeeksTemplate.xlsx");
 		FileInputStream streamPlanilha;
 		try {
 			streamPlanilha = new FileInputStream(file);
-			fileImport.importExcelFile(streamPlanilha);
+			fileImport.importListAluno(streamPlanilha);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
