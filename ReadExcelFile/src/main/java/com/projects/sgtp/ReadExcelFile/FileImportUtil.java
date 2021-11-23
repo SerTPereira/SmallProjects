@@ -78,50 +78,6 @@ public class FileImportUtil {
 		}
 	}
 	
-	
-	public List<Aluno> importListAluno(FileInputStream fileStream) {
-		List<Aluno> alunos = new ArrayList<Aluno>();
-		int rowNumber;
-		Aluno aluno;
-		
-		try {
-			XSSFWorkbook workbook = new XSSFWorkbook(fileStream);
-			
-			int sheetCount = workbook.getNumberOfSheets();
-			XSSFSheet sheet = workbook.getSheetAt(0);
-			
-			Iterator<Row> rowIterator = sheet.iterator();
-			while (rowIterator.hasNext()) {
-				Row row = (Row) rowIterator.next();
-				
-				rowNumber = row.getRowNum();
-				if(rowNumber == 0) {
-					System.out.println("Primeira linha skip: [" + rowNumber + "]");
-				} else {
-					aluno = new Aluno(
-							extractCellValue(row.getCell(0, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
-							extractCellValue(row.getCell(1, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
-							extractCellValue(row.getCell(2, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
-							extractCellValue(row.getCell(3, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
-							extractCellValue(row.getCell(4, MissingCellPolicy.CREATE_NULL_AS_BLANK)), 
-							extractCellValue(row.getCell(5, MissingCellPolicy.CREATE_NULL_AS_BLANK)));
-
-					System.out.println("Linha [" + String.format("%3d", rowNumber) + "] : " + aluno);
-					alunos.add(aluno);
-				}
-				
-
-			}
-			
-			workbook.close();
-		} catch (Exception e) {
-			System.out.println("Exception: " + e.getMessage());
-		}
-		
-		return alunos;
-	}
-	
-	
 	public String extractCellValue(Cell cell) {
 		String result;
 		
@@ -221,4 +177,73 @@ public class FileImportUtil {
 			System.out.println("Exception: " + e.getMessage());
 		}
 	}
+	
+	public Classe importarAlunosParaClasse(Classe classe, FileInputStream fileStream) {
+		int rowNumber;
+		Matricula matricula;
+		
+		if(classe.getAlunosMatriculados() == null) {
+			classe.setAlunosMatriculados(new ArrayList<Matricula>());
+		}
+		
+		String numero;
+		int intNumero;
+		
+		String nome;
+		String ra_numero;
+		String ra_digito;
+		String ra_estado;
+		String situacao;
+		
+		try {
+			XSSFWorkbook workbook = new XSSFWorkbook(fileStream);
+			
+			int sheetCount = workbook.getNumberOfSheets();
+			XSSFSheet sheet = workbook.getSheetAt(0);
+			
+			Iterator<Row> rowIterator = sheet.iterator();
+			while (rowIterator.hasNext()) {
+				Row row = (Row) rowIterator.next();
+				
+				rowNumber = row.getRowNum();
+				if(rowNumber == 0) {
+					System.out.println("Primeira linha skip: [" + rowNumber + "]");
+				} else {
+					
+					nome = extractCellValue(row.getCell(1, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+					ra_numero = extractCellValue(row.getCell(2, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+					ra_digito = extractCellValue(row.getCell(3, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+					ra_estado = extractCellValue(row.getCell(4, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+
+					situacao = extractCellValue(row.getCell(5, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+					numero = extractCellValue(row.getCell(0, MissingCellPolicy.CREATE_NULL_AS_BLANK));
+					try {
+						intNumero = Integer.parseInt(numero);
+					} catch (Exception e) {
+						intNumero = -1;
+					}
+
+					if(intNumero == -1) {
+						System.out.println("Erro encontrado na linha: " + (rowNumber + 1));
+					} else if (intNumero == 0) {
+						System.out.println("Fim da importação na linha:  " + (rowNumber + 1));
+						break;
+					} else {
+						matricula = new Matricula(nome, ra_numero, ra_digito, ra_estado, situacao, intNumero);
+						classe.getAlunosMatriculados().add(matricula);
+						System.out.println("Linha [" + String.format("%3d", rowNumber) + "] : " + matricula);
+					}
+				}
+			}
+			
+			workbook.close();
+		} catch (Exception e) {
+			System.out.println("Exception: " + e.getMessage());
+		}
+		
+		
+		return classe;
+	}
+
+
 }

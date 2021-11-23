@@ -13,7 +13,8 @@ public class App {
 		FileInputStream streamPlanilha;
 		try {
 			streamPlanilha = new FileInputStream(file);
-			fileImport.importListAluno(streamPlanilha);
+			Classe classe = new Classe();
+			fileImport.importarAlunosParaClasse(classe, streamPlanilha);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
